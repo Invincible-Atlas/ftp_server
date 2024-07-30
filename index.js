@@ -1,6 +1,7 @@
 fs = require("fs");
 path = require("path");
 express = require("express");
+const mime = require('mime-types');
 function walk(dir) {
   let fsjson = [];
   // get the contents of dir
@@ -30,7 +31,7 @@ function walk(dir) {
                   // console.log(fsjson)
 
               }else{
-                fsjson.push({"name":item});
+                fsjson.push({"name":item,"path":itemPath});
                 // console.log(fsjson)
               }
 
@@ -42,23 +43,6 @@ function walk(dir) {
   return(fsjson);
 };
 console.log(JSON.stringify(walk("./files/")));
-
-// const isDirectory = filepath => fs.statSync(filepath).isDirectory();
-// const getDirectories = filepath =>
-//     fs.readdirSync(filepath).map(name => path.join(filepath, name)).filter(isDirectory);
-
-// const isFile = filepath => fs.statSync(filepath).isFile();  
-// const getFiles = filepath =>
-//     fs.readdirSync(filepath).map(name => path.join(filepath, name)).filter(isFile);
-
-// const getFilesRecursively = (filepath) => {
-//     let dirs = getDirectories(filepath);
-//     let files = dirs
-//         .map(dir => getFilesRecursively(dir)) // go through each directory
-//         .reduce((a,b) => a.concat(b), []);    // map returns a 2d array (array of file arrays) so flatten
-//     return files.concat(getFiles(filepath));
-// };
-// console.log(getFilesRecursively("./files/"))
 function readFile(filePath) {
     try {
       const data = fs.readFileSync(filePath);
@@ -75,16 +59,24 @@ const port = 4000
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
   res.send('<script>window.location.href = window.location.href + "public/index.html";</script>')
-})
+});
+app.get('/files/*', function(req, res){
+  var filepath = req.path.replace("/files/","");
+  const file = `${__dirname}/files/${filepath}`;
+  const mimeType = mime.lookup(file);
+  res.setHeader("content-type",mimeType);
+  res.send(readFile(file)); // Set disposition and send it.
+  // res.send(req.path);
+});
 app.get('/download/*', function(req, res){
     var filepath = req.path.replace("/download","");
-    const file = `${__dirname}/files/${filepath}`;
+    const file = `${__dirname}${filepath}`;
     res.download(file); // Set disposition and send it.
     // res.send(req.path);
 });
 app.get("/files", (req,res) =>{
-
-  res.send('<script>window.location.href = window.location.href + "public/files.html";</script>')
+  fs.writeFileSync("./public/files.json",JSON.stringify(walk("./files/")))
+  res.send('<script>window.location.href = window.location.href.replace(window.location.pathname,"").replace(window.location.search,"") + "/files.html";</script>')
 });
 app.all('*', (req, res) => {
     res.status(404).send('<h1>This page doesn'+"'"+'t exist, dumbass!</h1>');

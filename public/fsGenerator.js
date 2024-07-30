@@ -5,12 +5,16 @@ console.log("hello world");
 function getBaseURL(){
     return(window.location.href.replace(window.location.pathname,'').replace(window.location.search,''));
 }
+let reflink = document.createElement("a");
+reflink.innerHTML = "⟳";
+reflink.href = getBaseURL()+"/files";
+document.getElementsByTagName("body")[0].appendChild(reflink);
 fetch(getBaseURL()+"/files.json").then((res)=>{
     if (!res.ok) {
         throw new Error
             (`HTTP error! Status: ${res.status}`);
     }
-    return res.json();
+    return(res.json());
 }).then((data) => {
     document.getElementsByTagName("body")[0].appendChild(generate(data));
 })
@@ -55,8 +59,13 @@ function generate(tree,isFolder){
             }else{
                 ico.classList = "icon fiv-viv fiv-icon-blank"
             }
-            let text = document.createElement("span");
+            let text = document.createElement("a");
             text.innerHTML = "  "+tree[i].name;
+            text.href = getBaseURL()+"/"+tree[i].path;
+            let download = document.createElement("a");
+            download.href = getBaseURL()+"/download/"+tree[i].path;
+            download.innerHTML = "↓";
+            
             if(isFolder){
                 line = document.createElement("span");
                 if(i<tree.length-1){
@@ -67,8 +76,10 @@ function generate(tree,isFolder){
                 
                 container.appendChild(line);
             }
+            
             container.appendChild(ico);
             container.appendChild(text);
+            container.appendChild(download);
             fsContainer.appendChild(container);
         }
     }

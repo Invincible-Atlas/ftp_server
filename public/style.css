@@ -1,6 +1,9 @@
 span{
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+a{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 .folder:hover .folderContents{
     display: block;
 }
