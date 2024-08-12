@@ -4,9 +4,9 @@ span{
 a{
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-.folder:hover .folderContents{
+/* .folder:hover .folderContents{
     display: block;
-}
+} */
 .folderContents{
     display:none;
 }
