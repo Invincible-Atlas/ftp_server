@@ -2,6 +2,12 @@ fs = require("fs");
 path = require("path");
 express = require("express");
 const mime = require('mime-types');
+function setCorsHeaders(req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', 'https://worker-server.pages.dev*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+}
 function walk(dir) {
   let fsjson = [];
   // get the contents of dir
@@ -54,6 +60,7 @@ function readFile(filePath) {
 const app = express()
 const bodyParser = require('body-parser');
 const { dirname } = require("path");
+app.use(setCorsHeaders);
 app.use(bodyParser.urlencoded({ extended: true }));
 const port = 4000
 app.use(express.static(path.join(__dirname, 'public')));
