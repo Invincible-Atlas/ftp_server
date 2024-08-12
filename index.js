@@ -63,7 +63,10 @@ app.get('/', (req, res) => {
 app.get('/files/*', function(req, res){
   var filepath = req.path.replace("/files/","");
   const file = `${__dirname}/files/${filepath}`;
-  const mimeType = mime.lookup(file);
+  let mimeType = mime.lookup(file);
+  if(mimeType == "text/html"){
+    mimeType = "text/plain";
+  }
   res.setHeader("content-type",mimeType);
   res.send(readFile(file)); // Set disposition and send it.
   // res.send(req.path);
@@ -75,7 +78,8 @@ app.get('/download/*', function(req, res){
     // res.send(req.path);
 });
 app.get("/files", (req,res) =>{
-  fs.writeFileSync("./public/files.json",JSON.stringify(walk("./files/")))
+  fs.writeFileSync("./public/files.json",JSON.stringify(walk("./files/")));
+  // console.log(`${req.socket.remoateAddress} accessed the files page`)
   res.send('<script>window.location.href = window.location.href.replace(window.location.pathname,"").replace(window.location.search,"") + "/files.html";</script>')
 });
 app.all('*', (req, res) => {
